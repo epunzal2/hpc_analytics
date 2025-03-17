@@ -1,0 +1,10 @@
+Bootstrap: docker
+From: continuumio/miniconda3
+
+%post
+  apt-get update && apt-get install -y graphviz
+  conda config --add channels conda-forge
+  conda install --file requirements.txt
+
+%runscript
+  streamlit run /app/dashboard.py --server.port $PORT
