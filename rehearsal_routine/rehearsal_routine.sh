@@ -158,7 +158,7 @@ ENV_CHECKS_SUMMARY+=",QuotaCmd($QUOTA_CMD_STATUS)"
 log_message "Environment Check Results: $ENV_CHECKS_SUMMARY"
 
 # 4. Anonymize and Log Summary
-SUMMARY_LINE="JobID: $JOB_ID, Status: $JOB_STATUS, CPU: $CPU_TIME_RAW, Mem: $MEM_USAGE_STR, EnvChecks: $ENV_CHECKS_SUMMARY"
+SUMMARY_LINE="JobID: $JOB_ID, Status: $JOB_STATUS, CPU: $CPU_TIME_RAW, Mem: $MEM_USAGE_STR, GPU: $GPU_ARCHITECTURE, EnvChecks: $ENV_CHECKS_SUMMARY"
 ANONYMIZED_SUMMARY=$(anonymize_text "$SUMMARY_LINE")
 
 log_message "Appending anonymized summary to log: $LOG_FILE"
@@ -166,12 +166,39 @@ echo "$(date '+%Y-%m-%d %H:%M:%S') - $ANONYMIZED_SUMMARY" >> "$LOG_FILE"
 
 log_message "HPC Rehearsal Routine Finished."
 
+# 5. Submit GPU Test Job
+log_message "Submitting GPU test job: test_job_gpu.slurm"
+GPU_JOB_SUBMISSION_OUTPUT=$(sbatch test_job_gpu.slurm)
+GPU_JOB_ID=$(echo "$GPU_JOB_SUBMISSION_OUTPUT" | awk '{print $4}')
+
+if [[ -z "$GPU_JOB_ID" || ! "$GPU_JOB_ID" =~ ^[0-9]+$ ]]; then
+    log_message "ERROR: Failed to submit GPU job or parse Job ID from output: $GPU_JOB_SUBMISSION_OUTPUT"
+    ANON_ERROR=$(anonymize_text "ERROR: GPU Job submission failed.")
+    log_message "$ANON_ERROR"
+    GPU_ARCHITECTURE="N/A"
+else
+    log_message "GPU test job submitted with ID: $GPU_JOB_ID"
+    # Wait briefly and Check GPU Job Status
+    log_message "Waiting 15 seconds for GPU job completion..."
+    sleep 15
+    GPU_LOG_FILE="rehearsal_gpu_job_$GPU_JOB_ID.log"
+    if [[ -f "$GPU_LOG_FILE" ]]; then
+      GPU_ARCHITECTURE_RAW=$(grep "GPU Architecture:" "$GPU_LOG_FILE" | awk -F': ' '{print $2}')
+      GPU_ARCHITECTURE=$(anonymize_text "$GPU_ARCHITECTURE_RAW")
+      log_message "GPU Architecture: $GPU_ARCHITECTURE"
+    else
+      log_message "WARNING: Could not find GPU log file: $GPU_LOG_FILE"
+      GPU_ARCHITECTURE="N/A"
+    fi
+fi
+
 # Provide a simple stdout summary
 echo "---"
 echo "Rehearsal Summary ($(date '+%Y-%m-%d %H:%M:%S')):"
 echo "  Job ID: $JOB_ID"
 echo "  Status: $JOB_STATUS"
 echo "  CPU Time: $CPU_TIME_RAW"
+  GPU Architecture: $GPU_ARCHITECTURE
 echo "  Memory MaxRSS: $MEM_USAGE_STR"
 echo "  Env Checks: $ENV_CHECKS_SUMMARY"
 echo "  Log File: $LOG_FILE"

@@ -13,3 +13,4 @@
     *   `test_job.slurm`: Simple Slurm test job.
     *   `README.md`: Usage and explanation documentation.
     *   `PROCESS_LOG.md`: This file.
+    *   `test_job_gpu.slurm`: Simple Slurm GPU test job.

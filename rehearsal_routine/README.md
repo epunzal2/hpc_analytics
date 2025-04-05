@@ -27,6 +27,7 @@ To fulfill the requirements of the prompt (see `TASKS.md`) by establishing a rep
     *   Modify `CHECK_CACHE="/cache/home/[USERID]"` to your cache directory. The script will replace `[USERID]` with your username.
     *   The script checks for Python using `python --version`. If you use Miniconda, the script will attempt to detect it and get the version using `conda list python`.
     *   The script checks for the availability of the `cuda`, `intel`, `mpi`, `gcc`, and `apptainer` modules.
+    *   The script also submits a GPU test job (`test_job_gpu.slurm`) to check GPU availability and retrieve its architecture.
 
 ## Execution
 
@@ -41,6 +42,7 @@ The script will:
 *   Perform the configured environment checks.
 *   Append an anonymized summary line to the daily log file (`rehearsal_log_YYYY-MM-DD.txt`).
 *   Print a final summary to the terminal.
+*   Submit a GPU test job to check GPU availability and retrieve its architecture.
 
 ## Daily Usage & Verification
 
@@ -48,11 +50,15 @@ The script will:
 *   Collect the generated `rehearsal_log_YYYY-MM-DD.txt` files. These contain the timestamped, anonymized summaries needed for the verification prompt.
 *   The terminal output also provides an immediate success/fail summary.
 
+## GPU Job
+*   The script also submits a GPU test job (`test_job_gpu.slurm`) to check GPU availability and retrieve its architecture.
+*   The GPU architecture is obtained from the `nvidia-smi` command.
+
 ## Log Format
 
 Each line appended to `rehearsal_log_YYYY-MM-DD.txt` follows this format:
 
-`YYYY-MM-DD HH:MM:SS - JobID: [JOB_ID], Status: [SUCCESS|FAIL (Reason)], CPU: [CPU_TIME]s, Mem: [MEM_USAGE]MB/GB/N/A, EnvChecks: Python([OK:Version|FAIL]),Modules([OK|FAIL]),[MODULE_NAME]([OK|FAIL]),[FS_NAME]([OK|FAIL])`
+`YYYY-MM-DD HH:MM:SS - JobID: [JOB_ID], Status: [SUCCESS|FAIL (Reason)], CPU: [CPU_TIME]s, Mem: [MEM_USAGE]MB/GB/N/A, GPU: [GPU_ARCHITECTURE], EnvChecks: Python([OK:Version|FAIL]),Modules([OK|FAIL]),[MODULE_NAME]([OK|FAIL]),[FS_NAME]([OK|FAIL])`
 
 *   **Timestamp:** Date and time the log entry was written.
 *   **JobID:** The Slurm Job ID of the test job.
@@ -65,6 +71,7 @@ Each line appended to `rehearsal_log_YYYY-MM-DD.txt` follows this format:
     *   `[MODULE_NAME]`: OK or FAIL (checks if `module load YOUR_MODULE` works). Name is uppercased.
     *   `[FS_NAME]`: OK or FAIL (checks if `ls /your/filesystem` works). Name is the last part of the path.
 *   `QuotaCmd`: OK or FAIL (checks if the `mmlsquota` command executes successfully).
+*   `GPU`: The architecture of the GPU, obtained from `nvidia-smi`.
 
 ## Anonymization
 
