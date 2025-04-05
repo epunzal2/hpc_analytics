@@ -2,3 +2,6 @@ pandas>=2.0
 matplotlib>=3.7
 streamlit>=1.25
 seaborn>=0.12
+plotly==5.18.0
+dash==2.14.2
+python-dotenv==1.0.0

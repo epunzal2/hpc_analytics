@@ -1,5 +1,8 @@
-output/*
+output/
 !*.py
 !*.sh
 !*.md
 !requirements.txt
+TASKS.md
+rehearsal_routine/TASKS.md
+.cline*

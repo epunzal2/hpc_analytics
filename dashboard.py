@@ -37,5 +37,22 @@ def main():
 
     st.write(f"Data from: {today}")
 
+    st.write("## GPU Analytics")
+    
+    # Placeholder for GPU analytics display
+    try:
+        from gpu_analytics import GPUTracker
+        gpu_data_path = "output/gpu_allocations.csv"
+        gpu_tracker = GPUTracker(gpu_data_path)
+        gpu_tracker.process_data()
+        busy_nodes = gpu_tracker.get_busy_nodes()
+        if busy_nodes:
+            st.write("### Busiest Nodes (GPU Hours > 100):")
+            st.write(busy_nodes)
+        else:
+            st.write("No busy nodes found with GPU hours > 100.")
+    except Exception as e:
+        st.error(f"Error processing GPU data: {e}")
+
 if __name__ == "__main__":
     main()
