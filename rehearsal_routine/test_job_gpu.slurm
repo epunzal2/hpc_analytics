@@ -6,6 +6,7 @@
 #SBATCH --mem=100M
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
+#SBATCH --partition=gpu
 #SBATCH --gres=gpu:1 # Request 1 GPU
 
 echo "GPU Rehearsal Job Started: $(date)"

@@ -16,7 +16,7 @@ GPU_JOB_SCRIPT="test_job_gpu.slurm"
 
 # These can be moved to a config file in the future
 CHECK_FS="/scratch"
-CHECK_CACHE="/cache/home/username"
+CHECK_CACHE="/cache/home/$USER"
 MODULES_TO_CHECK=("cuda" "intel" "mpi" "gcc" "apptainer")
 
 # =========================
